@@ -1,0 +1,45 @@
+{
+  "name": "daba-dojo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "build": "vite build",
+    "build:static": "vite build --mode static",
+    "start": "tsx server.ts --prod",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist dist-static",
+    "check:lessons": "tsx scripts/check-lessons.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "chess.js": "^1.4.0",
+    "dexie": "^4.4.7",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-chessboard": "^5.12.1",
+    "react-dom": "^19.0.1",
+    "stockfish": "^19.0.1",
+    "vite": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.4.21",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2",
+    "@types/express": "^4.17.21"
+  },
+  "description": "Personal chess trainer: lessons, Lichess puzzles, Stockfish bots and game review, with an optional Gemini coach.",
+  "engines": {
+    "node": ">=20"
+  }
+}
