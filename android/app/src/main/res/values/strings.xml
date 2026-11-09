@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Daba Dojo</string>
+    <string name="title_activity_main">Daba Dojo</string>
+    <string name="package_name">com.dabadojo.app</string>
+    <string name="custom_url_scheme">com.dabadojo.app</string>
+</resources>

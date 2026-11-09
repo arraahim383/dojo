@@ -82,13 +82,13 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ userProfile }) => {
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-widest uppercase">
           <TrendingUp className="w-3.5 h-3.5" />
-          Disciple Training Ledger
+          Learning progress
         </div>
         <h1 className="text-3xl font-serif font-black text-stone-100 tracking-tight">
           Your Progress & Strengths Analysis
         </h1>
         <p className="text-stone-400 text-xs sm:text-sm max-w-lg mx-auto">
-          Every tactic solved, bot overcome, and coordinate identified is preserved directly in your browser.
+          See what you have practiced, what is improving, and where to focus next.
         </p>
       </div>
 
@@ -243,15 +243,15 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ userProfile }) => {
         </div>
       </div>
 
-      {/* Dojo Opponents Defeated Trophy Room */}
+      {/* Bot progress */}
       <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-xl space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-stone-100 font-serif font-bold text-lg">
             <Swords className="w-5 h-5 text-amber-500" />
-            <span>Bots Defeated Tatami</span>
+            <span>Bot progress</span>
           </div>
           <span className="text-xs font-mono text-amber-400 font-bold">
-            {userProfile.botsBeaten.length} / {CHESS_BOTS.length} Conquered
+            {userProfile.botsBeaten.length} / {CHESS_BOTS.length} beaten
           </span>
         </div>
 

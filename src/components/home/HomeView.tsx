@@ -1,29 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { db, getTodayActivity, type UserProfile, type DailyActivity } from '../../db';
-import { CHESS_BOTS } from '../../data/bots';
-import { THEME_LABELS } from '../../services/puzzleThemes';
 import {
-  Swords,
   Award,
-  Eye,
-  Flame,
   CheckCircle2,
-  Circle,
-  ArrowRight,
-  Sparkles,
-  Trophy,
-  Shield,
   Clock,
-  Compass,
   BookmarkCheck,
-  Search,
   BookOpen,
   Target
 } from 'lucide-react';
 
 interface HomeViewProps {
   userProfile: UserProfile;
-  onNavigate: (tab: string) => void;
+  onNavigate: (tab: string, puzzleMode?: 'rated' | 'mistakes') => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -32,98 +20,44 @@ export const HomeView: React.FC<HomeViewProps> = ({
 }) => {
   const [dueMistakesCount, setDueMistakesCount] = useState<number>(0);
   const [today, setToday] = useState<DailyActivity | null>(null);
-  const [weakTheme, setWeakTheme] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       const m = await db.myMistakes.toArray();
       setDueMistakesCount(m.filter((item) => item.nextReviewDate <= Date.now()).length);
       setToday(await getTodayActivity());
-      // weakest theme: lowest success rate among themes with 5+ attempts
-      const hist = await db.puzzleHistory.toArray();
-      const stats: Record<string, { n: number; w: number }> = {};
-      hist.forEach((h) => {
-        const t = h.theme;
-        if (!t || t === 'tactics') return;
-        stats[t] = stats[t] || { n: 0, w: 0 };
-        stats[t].n++;
-        if (h.result === 'win') stats[t].w++;
-      });
-      const weakest = Object.entries(stats)
-        .filter(([, v]) => v.n >= 5)
-        .sort((a, b) => a[1].w / a[1].n - b[1].w / b[1].n)[0];
-      setWeakTheme(weakest ? weakest[0] : null);
     })();
   }, [userProfile]);
 
-  // The bot to play today: the gate bot for your level if not yet beaten, otherwise the next one up
-  const gateBotId = [
-    userProfile.settings.gates.gate1to2.botBeaten,
-    userProfile.settings.gates.gate2to3.botBeaten,
-    userProfile.settings.gates.gate3to4.botBeaten,
-    userProfile.settings.gates.gate4toMastery.botBeaten,
-  ][Math.min(3, userProfile.currentLevel - 1)];
-  const suggestedBot =
-    CHESS_BOTS.find((b) => b.id === gateBotId && !userProfile.botsBeaten.includes(b.id)) ||
-    CHESS_BOTS.find((b) => !userProfile.botsBeaten.includes(b.id)) ||
-    CHESS_BOTS[CHESS_BOTS.length - 1];
-
   const d = today;
-  // Today's Plan (~30–45 min), built from your own data and reset every day
+  // A short plan supports regular learning without making a long checklist feel mandatory.
   const todayTasks = [
     {
       id: 'task_lesson_drill',
-      title: 'Complete 1 lesson or endgame drill',
-      subtitle: d && d.lessonsOrDrills > 0 ? `${d.lessonsOrDrills} done today` : 'Learn something new or sharpen a technique',
+      title: 'Learn one idea',
+      subtitle: d && d.lessonsOrDrills > 0 ? 'A lesson or drill done today' : 'Start with the next short lesson',
       completed: !!d && d.lessonsOrDrills > 0,
       action: () => onNavigate('learn'),
-      btnLabel: 'Train',
+      btnLabel: 'Learn',
       icon: BookOpen,
     },
     {
       id: 'task_rated_puzzles',
-      title: 'Solve 10 rated puzzles',
-      subtitle: `${Math.min(10, d?.ratedPuzzles ?? 0)} / 10 today (rating ${userProfile.puzzleRating})`,
-      completed: (d?.ratedPuzzles ?? 0) >= 10,
+      title: 'Practice with 5 puzzles',
+      subtitle: `${Math.min(5, d?.ratedPuzzles ?? 0)} / 5 today · rating ${userProfile.puzzleRating}`,
+      completed: (d?.ratedPuzzles ?? 0) >= 5,
       action: () => onNavigate('puzzles'),
-      btnLabel: 'Solve',
+      btnLabel: 'Practice',
       icon: Award,
     },
     {
-      id: 'task_theme_puzzles',
-      title: weakTheme ? `5 puzzles on your weakest theme: ${THEME_LABELS[weakTheme] || weakTheme}` : '5 theme puzzles',
-      subtitle: `${Math.min(5, d?.themePuzzles ?? 0)} / 5 today${weakTheme ? '' : ' (play more puzzles to find your weak spot)'}`,
-      completed: (d?.themePuzzles ?? 0) >= 5,
-      action: () => onNavigate('puzzles'),
-      btnLabel: 'Themes',
-      icon: Target,
-    },
-    {
       id: 'task_mistakes',
-      title: 'Review your due mistakes',
+      title: 'Review due positions',
       subtitle: dueMistakesCount > 0 ? `${dueMistakesCount} position${dueMistakesCount === 1 ? '' : 's'} due` : 'Nothing due right now',
       completed: dueMistakesCount === 0,
-      action: () => onNavigate('puzzles'),
-      btnLabel: dueMistakesCount === 0 ? 'Done' : 'Review',
+      action: () => onNavigate('puzzles', 'mistakes'),
+      btnLabel: dueMistakesCount === 0 ? 'All clear' : 'Review',
       icon: BookmarkCheck,
-    },
-    {
-      id: 'task_bot_game',
-      title: '1 game against a bot',
-      subtitle: `Suggested: ${suggestedBot.name} (${suggestedBot.elo})${d && d.botGames > 0 ? ` · ${d.botGames} played today` : ''}`,
-      completed: (d?.botGames ?? 0) > 0,
-      action: () => onNavigate('play'),
-      btnLabel: 'Play',
-      icon: Swords,
-    },
-    {
-      id: 'task_review_game',
-      title: 'Review that game with Stockfish',
-      subtitle: d && d.gamesReviewed > 0 ? `${d.gamesReviewed} reviewed today` : 'Find your key mistakes and retry them',
-      completed: (d?.gamesReviewed ?? 0) > 0,
-      action: () => onNavigate('review'),
-      btnLabel: 'Review',
-      icon: Search,
     },
   ];
 
@@ -131,52 +65,52 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
-      {/* Hero Dojo Welcome Banner */}
+      {/* Learning-first welcome */}
       <div className="relative rounded-3xl bg-gradient-to-r from-stone-900 via-amber-950/40 to-stone-900 border border-amber-600/30 p-6 sm:p-10 shadow-2xl overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-2xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-widest uppercase">
-            <Sparkles className="w-3.5 h-3.5" />
-            Dojo Level {userProfile.currentLevel} Disciple
+            <BookOpen className="w-3.5 h-3.5" />
+            Level {userProfile.currentLevel} learning path
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-serif font-black text-stone-100 tracking-tight">
-            Sharpen Your Blade, Disciple.
+            Build stronger chess habits.
           </h1>
 
           <p className="text-stone-300 text-sm sm:text-base leading-relaxed">
-            Welcome to your personal training sanctuary. Engine analysis, disciplined tactical drills, and Sensei guidance designed to elevate you from beginner to 1800 strength.
+            Learn an idea, try it on the board, and see what to work on next. Start wherever you are and improve at your own pace.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <button
-              onClick={() => onNavigate('puzzles')}
+              onClick={() => onNavigate('learn')}
               className="py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-serif font-black text-sm uppercase tracking-wider shadow-xl hover:shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Award className="w-4 h-4 fill-current" />
-              <span>Resume Rated Puzzles</span>
+              <BookOpen className="w-4 h-4" />
+              <span>Continue learning</span>
             </button>
             <button
-              onClick={() => onNavigate('play')}
+              onClick={() => onNavigate('puzzles')}
               className="py-3 px-6 rounded-2xl bg-stone-800/80 hover:bg-stone-800 text-stone-200 border border-stone-700 font-serif font-bold text-sm tracking-wider active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Swords className="w-4 h-4" />
-              <span>Spar vs Bots</span>
+              <Target className="w-4 h-4" />
+              <span>Practice puzzles</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Today's Training Plan Card (~30-45 min) */}
+      {/* Today's short learning plan */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-500" />
-              <h2 className="font-serif font-bold text-xl text-stone-100">Today's Plan (30–45 min)</h2>
+              <h2 className="font-serif font-bold text-xl text-stone-100">A focused 15-minute plan</h2>
             </div>
-            <p className="text-xs text-stone-400">Resets every day and ticks itself off as you train</p>
+            <p className="text-xs text-stone-400">Three small steps. Skip or change anything whenever you like.</p>
           </div>
           <div className="flex items-center gap-2 text-xs font-mono font-bold text-stone-300 bg-stone-900 border border-stone-800 px-3 py-1.5 rounded-xl">
             <span className="text-amber-400">{completedCount}</span> / {todayTasks.length} Completed

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173d32">
+  <title>Privacy — Daba Dojo</title>
+  <style>
+    :root{color-scheme:dark;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0c0a09;color:#f3f0e8}
+    body{margin:0;padding:32px 18px 64px;line-height:1.7}
+    main{max-width:760px;margin:auto}
+    a{color:#a7e2c1}h1,h2{line-height:1.2}h1{font-size:2rem;letter-spacing:-.04em}h2{margin-top:2rem;font-size:1.2rem}
+    p,li{color:#c6c3bb}.brand{color:#dfc37c;font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+    .card{padding:18px 20px;background:#171b18;border:1px solid #343a34;border-radius:16px}
+  </style>
+</head>
+<body>
+<main>
+  <p class="brand">Daba Dojo · Privacy</p>
+  <h1>Your chess progress stays yours.</h1>
+  <p>Last updated: November 10, 2026</p>
+  <p>This page explains what Daba Dojo stores and how to remove it. Account sync is available only on builds connected to the Daba Dojo account service. Without it, the app works on-device and does not upload your training progress.</p>
+
+  <h2>Information the app uses</h2>
+  <ul>
+    <li><strong>Account:</strong> your email address and authentication details are handled by Supabase Auth. Daba Dojo does not receive or store your plain-text password.</li>
+    <li><strong>Training progress:</strong> lesson completion, puzzle rating and attempts, daily activity, saved bot games, reviewed mistakes, preferences, and puzzles you import.</li>
+    <li><strong>On-device storage:</strong> the same training information is stored in the app's local IndexedDB so practice can continue offline. Bundled lessons, puzzles, and chess engines stay on the device.</li>
+  </ul>
+  <div class="card"><strong>Email is your account identifier; progress is not stored in your email inbox.</strong> When account sync is enabled, the progress listed above is saved in a private Supabase database row linked to your account. Database row security limits access to that account.</div>
+
+  <h2>Optional coach and online services</h2>
+  <p>If you ask the Gemini coach to explain a chess position, the app sends the board position, the move you selected, the supplied engine lines, and your learning level to the Daba Dojo API so it can request an explanation. Your email and password are not sent with that request. Lichess puzzle requests may connect to Lichess when online puzzle features are used. The core lessons, bundled puzzles, bots, and review tools work without those services.</p>
+
+  <h2>Why information is used</h2>
+  <p>Account and progress data are used to sign you in, restore your training across your devices, and provide the features you choose. Daba Dojo does not sell this information, run advertising profiles, or include third-party advertising analytics.</p>
+
+  <h2>Your choices and deletion</h2>
+  <p>You can export a JSON backup from Settings. If you use an account-enabled build, choose <em>Settings → Account & progress → Delete account and cloud progress</em> to permanently remove your account and synced progress. The current installation also clears its account-specific local training data. Uninstalling the app alone may not remove cloud data.</p>
+  <p>You can use the app without an account on builds that offer local mode. In that mode, progress remains on that device and can be lost if its app data is cleared; export a backup if you want to move or preserve it.</p>
+
+  <h2>Service providers and security</h2>
+  <p>When account sync is configured, Supabase provides authentication and the private progress database. Google provides the optional Gemini coaching service. Requests use secure HTTPS connections. No internet service can guarantee that transmission or storage is risk-free.</p>
+
+  <h2>Questions</h2>
+  <p>For questions about this policy, use the <a href="https://github.com/arraahim383/dojo">Daba Dojo project page</a>. Do not include your email address or other personal information in a public issue.</p>
+  <p><a href="/">Return to Daba Dojo</a></p>
+</main>
+</body>
+</html>

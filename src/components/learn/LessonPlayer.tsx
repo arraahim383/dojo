@@ -332,7 +332,7 @@ export const LessonPlayer: React.FC<LessonPlayerProps> = ({
               <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-xl space-y-6">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-500">
                   <BookOpen className="w-4 h-4" />
-                  <span>Sensei Instruction</span>
+                  <span>Lesson</span>
                 </div>
 
                 <p className="text-stone-200 text-sm sm:text-base leading-relaxed font-sans">

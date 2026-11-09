@@ -1,16 +1,16 @@
 # Daba Dojo ♟️
 
-A personal chess trainer that takes you from your first game to club strength. It works like the learning side of chess.com, but runs entirely on your own computer.
+A personal chess trainer focused on learning: short interactive lessons, puzzles, practice games and reviews that help explain the next useful step.
 
 - **Learn**: 38 lessons in 4 levels (rules → tactics → strategy → advanced endgames), 115 interactive challenges. Tactics challenges are real Lichess puzzles, and every position was checked with Stockfish.
 - **Puzzles**: 20,970 real Lichess puzzles (ratings 400–2500), rated mode with your own puzzle rating, themes, Puzzle Rush, daily puzzle, a placement test, and a "My Mistakes" deck with spaced repetition.
 - **Play vs Bots**: 12 bots from 250 to 2500 on one calibrated strength scale, each with its own opening repertoire, plus optional coach warnings, hints and takebacks.
 - **Game Review**: full Stockfish review with accuracy, move classifications (Brilliant to Blunder, Book, Miss), eval graph, opening names, and a Retry mode for your key mistakes.
 - **Drills**: 14 endgame and middlegame positions to play out against Stockfish (K+Q mate, Lucena, Philidor, …).
-- **Openings, Vision trainer, Progress stats, Today's Plan**: a daily routine that ticks itself off as you train.
+- **Openings, Vision trainer, Progress stats, Today's Plan**: a short daily routine that keeps learning first and makes extra practice optional.
 - **Optional Gemini coach**: "Explain" buttons give a plain-English explanation grounded in Stockfish's lines. The app works fully without it.
 
-All progress is stored in your browser (IndexedDB). There are no accounts and no server database. You can back up and restore from Settings.
+Progress is stored on-device first (IndexedDB), so the core app works offline. Account-enabled builds add email sign-in and private cloud sync; users can also export a backup from Settings.
 
 ## Run it
 
@@ -22,6 +22,32 @@ npm run dev
 ```
 
 Open http://localhost:3000.
+
+### Email accounts and cloud progress
+
+The account screen is ready for Supabase email/password authentication. To turn on accounts for web and Android builds:
+
+1. Create a Supabase project and run [`supabase/migrations/20261110000000_user_progress.sql`](supabase/migrations/20261110000000_user_progress.sql) in its SQL Editor.
+2. In Supabase Auth, enable Email sign-in and configure email confirmation. Set the site URL and allowed redirect URL to `https://dojo-omega-two.vercel.app` (or your deployed app URL).
+3. Add these build variables to `.env.local` for local builds and Vercel's Production/Preview environments:
+
+   ```text
+   VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+   VITE_SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+   VITE_AUTH_REDIRECT_URL=https://dojo-omega-two.vercel.app
+   ```
+
+4. For account deletion, add these server-only variables to Vercel and local `.env.local`; the service-role value must never have a `VITE_` prefix or be bundled into the APK:
+
+   ```text
+   SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+   SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+   SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SERVICE_ROLE_KEY
+   ```
+
+5. Redeploy the website. For Android, build the APK after setting the three `VITE_` values so sign-in is enabled in that APK too.
+
+The first account on a device adopts existing local progress. Later sign-ins restore that account's cloud progress; changing to a different account clears the previous account's cached records before restoring the new account. The bundled 20,970-puzzle set remains local, while user-imported puzzles and training progress sync. If the account service is not configured, the app clearly offers local mode and does not claim that progress is syncing. Account data is associated with the user's email; it is stored in the private progress database, not in the email inbox. See [`public/privacy.html`](public/privacy.html).
 
 ### Optional: the Gemini coach
 
@@ -49,6 +75,35 @@ npm run build:static
 ```
 
 This writes `dist-static/`, which runs from any folder or static host with no server. Lessons, puzzles, bots, game review and drills all work. The Gemini coach and live Lichess puzzles need the Node server, so the static build switches them off with a clear message (the daily puzzle comes from the built-in set instead).
+
+### Deploy to Vercel with the Gemini coach
+
+Vercel can serve the static app and the `/api/explain` serverless function from the same project. In the Vercel project settings, use the repository root (`./`), build command `npm run build:static`, and output directory `dist-static`. The root `api/` directory is deployed as Vercel Functions.
+
+Add this environment variable in Vercel, then redeploy:
+
+- `GEMINI_API_KEY` for Production and Preview. Keep this server-side; never use a `VITE_` prefix for the key. The build detects Vercel and enables the coach automatically.
+- Optional: `GEMINI_MODEL` to override the default `gemini-3.8-flash` model.
+
+For other hosts that also provide the `/api/explain` endpoint, set `VITE_GEMINI_COACH=1` at build time to show the coach controls.
+
+This enables only the Gemini coach API. Live Lichess puzzle requests remain off in the static build; the bundled daily puzzle still works.
+
+### Android APK
+
+The Android app packages the same static web build in a native Capacitor shell. Chess lessons, puzzles, bots, analysis, and saved progress run on the device. The optional Gemini coach connects to the Daba Dojo Vercel API and needs that API to be deployed with `GEMINI_API_KEY` configured.
+
+Requirements: Node.js 22+, Android SDK Platform 36 and Build Tools, and a JDK 21 installation. Android Studio is optional if those command-line tools are installed.
+
+```bash
+npm install
+npx cap add android   # first time only
+npm run android:apk
+```
+
+The debug-signed, installable APK is written to `android/app/build/outputs/apk/debug/Daba-Dojo.apk`. To install it on a connected device with USB debugging enabled, run `adb install -r android/app/build/outputs/apk/debug/Daba-Dojo.apk`. A Play Store release needs a release signing key and a signed Android App Bundle.
+
+The latest debug APK is also published at [dojo-omega-two.vercel.app/downloads/Daba-Dojo.apk](https://dojo-omega-two.vercel.app/downloads/Daba-Dojo.apk). The Android build script removes downloadable APKs from the app bundle before syncing, so the app never embeds a copy of itself.
 
 ## Scripts
 

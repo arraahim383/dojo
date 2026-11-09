@@ -58,7 +58,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ userProfile, onRefreshProf
           Level {userProfile.currentLevel}: {levelName(userProfile.currentLevel)}
         </h1>
         <p className="text-stone-400 text-xs sm:text-sm max-w-lg mx-auto">
-          Work through the lessons for your level, then pass the gate: every requirement must be done.
+          Learn one chess idea at a time. Start with the next lesson, or revisit any lesson whenever you need it.
         </p>
         {nextLesson && (
           <button
@@ -70,8 +70,14 @@ export const LearnView: React.FC<LearnViewProps> = ({ userProfile, onRefreshProf
         )}
       </div>
 
+      <details className="group rounded-2xl border border-stone-800 bg-stone-900/50">
+        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-stone-300 marker:content-none">
+          <span>Level goals and progress</span>
+          <span className="text-xs font-medium text-stone-500 group-open:hidden">Optional · tap to view</span>
+          <span className="hidden text-xs font-medium text-stone-500 group-open:inline">Tap to close</span>
+        </summary>
       {/* Gates */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 pt-0">
         {gates.map((gate) => {
           const passed = userProfile.currentLevel > gate.fromLevel;
           const isCurrent = userProfile.currentLevel === gate.fromLevel;
@@ -131,6 +137,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ userProfile, onRefreshProf
           );
         })}
       </div>
+      </details>
 
       {/* Curriculum */}
       <div className="space-y-4">

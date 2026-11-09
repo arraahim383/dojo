@@ -338,7 +338,7 @@ export const DrillsView: React.FC<DrillsViewProps> = ({
                   <span>Drill Conquered!</span>
                 </div>
                 <p className="text-xs text-stone-300">
-                  Technique successfully proven against Stockfish. This drill is now recorded as passed in your Dojo belt gates.
+                  Technique proven against Stockfish. This drill is now recorded in your learning progress.
                 </p>
                 <div className="flex gap-2 pt-2">
                   <button

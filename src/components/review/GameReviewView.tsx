@@ -236,10 +236,10 @@ export const GameReviewView: React.FC<GameReviewViewProps> = ({
           Full-Game Stockfish Review & Key Moments
         </div>
         <h1 className="text-3xl font-serif font-black text-stone-100 tracking-tight">
-          Game Review Sanctuary
+          Game review
         </h1>
         <p className="text-stone-400 text-xs sm:text-sm max-w-lg mx-auto">
-          Deep Stockfish analysis with mathematical Expected Points (EP), move classifications, accuracy metrics, and Sensei explanations.
+          Review the key moments, understand the best move, and retry mistakes with Stockfish analysis.
         </p>
       </div>
 

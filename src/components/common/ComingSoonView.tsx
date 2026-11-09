@@ -33,7 +33,7 @@ export const ComingSoonView: React.FC<ComingSoonViewProps> = ({
 
       <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 text-left max-w-lg mx-auto space-y-3">
         <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">
-          Planned Dojo Architecture:
+          Planned features:
         </h4>
         <ul className="space-y-2 text-xs text-stone-300">
           {highlights.map((h, i) => (
@@ -50,7 +50,7 @@ export const ComingSoonView: React.FC<ComingSoonViewProps> = ({
           onClick={onNavigateHome}
           className="py-2.5 px-6 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 text-xs font-bold transition-all"
         >
-          Return to Tatami (Today's Plan)
+          Return to Today’s plan
         </button>
       </div>
     </div>

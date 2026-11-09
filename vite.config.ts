@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => ({
   base: mode === 'static' ? './' : '/',
   define: {
     'import.meta.env.VITE_STATIC': JSON.stringify(mode === 'static' ? '1' : ''),
+    'import.meta.env.VITE_GEMINI_COACH': JSON.stringify(
+      process.env.VITE_GEMINI_COACH === '1' || process.env.VERCEL === '1' || process.env.VERCEL === 'true' ? '1' : '',
+    ),
   },
   plugins: [react(), tailwindcss()],
   resolve: {

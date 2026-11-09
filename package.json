@@ -7,13 +7,21 @@
     "dev": "tsx server.ts",
     "build": "vite build",
     "build:static": "vite build --mode static",
+    "android:sync": "npm run build:static && node scripts/strip-android-downloads.mjs && cap sync android",
+    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug",
+    "android:open": "cap open android",
+    "render:social-preview": "node scripts/render-social-preview.mjs",
     "start": "tsx server.ts --prod",
     "lint": "tsc --noEmit",
     "clean": "rm -rf dist dist-static",
     "check:lessons": "tsx scripts/check-lessons.ts"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@fontsource-variable/manrope": "^5.3.0",
     "@google/genai": "^2.4.0",
+    "@supabase/supabase-js": "^2.119.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.1",
     "chess.js": "^1.4.0",
@@ -29,14 +37,16 @@
     "vite": "^8.3.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
-    "typescript": "^7.0.2",
-    "@types/express": "^4.17.21"
+    "typescript": "^7.0.2"
   },
   "description": "Personal chess trainer: lessons, Lichess puzzles, Stockfish bots and game review, with an optional Gemini coach.",
   "engines": {

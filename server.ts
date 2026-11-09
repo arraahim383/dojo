@@ -2,8 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { Chess } from 'chess.js';
+import deleteAccount from './api/account';
 
 dotenv.config({ path: ['.env.local', '.env'], quiet: true });
 
@@ -15,6 +16,7 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 
 app.use(express.json({ limit: '200kb' }));
+app.all('/api/account', (req, res) => void deleteAccount(req, res));
 
 const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
 
@@ -160,7 +162,7 @@ Explain this to the student.`;
 
   try {
     const response: any = await Promise.race([
-      ai.models.generateContent({ model: GEMINI_MODEL, contents: userPrompt, config: { systemInstruction, temperature: 0.2 } }),
+      ai.models.generateContent({ model: GEMINI_MODEL, contents: userPrompt, config: { systemInstruction, thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } } }),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 20_000)),
     ]);
     const raw: string = (response?.text || '').trim();

@@ -160,7 +160,7 @@ export const VisionView: React.FC<VisionViewProps> = ({
           Tactical Vision & Coordinates
         </div>
         <h1 className="text-3xl font-serif font-black text-stone-100 tracking-tight">
-          Board Coordinate Dojo
+          Board coordinates
         </h1>
         <p className="text-stone-400 text-xs sm:text-sm max-w-md mx-auto">
           Instant square recognition is the bedrock of rapid tactical calculation. Train to find any square in under a second.
@@ -347,7 +347,7 @@ export const VisionView: React.FC<VisionViewProps> = ({
               <Eye className="w-10 h-10 text-amber-500/70 mx-auto" />
               <h3 className="font-serif font-bold text-xl text-stone-100">Coordinate Reflex Test</h3>
               <p className="text-xs text-stone-400 leading-relaxed">
-                You will have 30 seconds to identify as many board coordinates as possible. Aim for at least 15 to fulfill your Level 1 Dojo Gate.
+                You have 30 seconds to identify as many board coordinates as possible. Use 15 correct answers as your first-level target.
               </p>
 
               <button

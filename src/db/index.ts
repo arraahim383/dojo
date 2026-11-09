@@ -39,6 +39,7 @@ export interface UserProfile {
 
 export interface LocalPuzzle {
   id: string; // PuzzleId
+  source?: 'imported'; // Omitted for the bundled puzzle set; used to sync only user-added puzzles.
   fen: string;
   moves: string; // space separated UCI
   rating: number;
@@ -126,6 +127,9 @@ export class DabaDojoDatabase extends Dexie {
     this.version(2).stores({
       dailyActivity: 'date',
       seenPuzzles: 'id, seenAt',
+    });
+    this.version(3).stores({
+      puzzles: 'id, rating, *themes, source',
     });
   }
 }
@@ -239,11 +243,12 @@ export async function updateUserProfile(updates: Partial<UserProfile>): Promise<
 // Export / Import entire IndexedDB for backup & zero account sync
 export async function exportDatabaseBackup(): Promise<string> {
   const profile = await getUserProfile();
-  const puzzles: LocalPuzzle[] = []; // the bundled puzzle set is re-imported automatically, no need to back it up
+  const puzzles = await db.puzzles.where('source').equals('imported').toArray();
   const history = await db.puzzleHistory.toArray();
   const games = await db.savedGames.toArray();
   const mistakes = await db.myMistakes.toArray();
   const daily = await db.dailyActivity.toArray();
+  const seen = await db.seenPuzzles.toArray();
 
   const backupData = {
     version: 1,
@@ -254,6 +259,7 @@ export async function exportDatabaseBackup(): Promise<string> {
     games,
     mistakes,
     daily,
+    seen,
   };
 
   return JSON.stringify(backupData, null, 2);
@@ -264,30 +270,54 @@ export async function importDatabaseBackup(jsonString: string): Promise<boolean>
     const data = JSON.parse(jsonString);
     if (!data || typeof data !== 'object') return false;
 
-    if (data.profile) {
-      await db.userProfile.put({ ...data.profile, id: 1 });
-    }
-    if (Array.isArray(data.puzzles) && data.puzzles.length > 0) {
-      await db.puzzles.bulkPut(data.puzzles);
-    }
-    if (Array.isArray(data.history)) {
-      await db.puzzleHistory.clear();
-      await db.puzzleHistory.bulkAdd(data.history);
-    }
-    if (Array.isArray(data.games)) {
-      await db.savedGames.clear();
-      await db.savedGames.bulkAdd(data.games);
-    }
-    if (Array.isArray(data.mistakes)) {
-      await db.myMistakes.clear();
-      await db.myMistakes.bulkAdd(data.mistakes);
-    }
-    if (Array.isArray(data.daily)) {
-      await db.dailyActivity.bulkPut(data.daily);
-    }
+    if (data.version !== 1) return false;
+    await db.transaction('rw', [db.userProfile, db.puzzles, db.puzzleHistory, db.savedGames, db.myMistakes, db.dailyActivity, db.seenPuzzles], async () => {
+      if (data.profile) {
+        await db.userProfile.put({ ...data.profile, id: 1 });
+      }
+      if (Array.isArray(data.puzzles)) {
+        const importedKeys = await db.puzzles.where('source').equals('imported').primaryKeys();
+        await db.puzzles.bulkDelete(importedKeys);
+        if (data.puzzles.length > 0) await db.puzzles.bulkPut(data.puzzles);
+      }
+      if (Array.isArray(data.history)) {
+        await db.puzzleHistory.clear();
+        await db.puzzleHistory.bulkAdd(data.history);
+      }
+      if (Array.isArray(data.games)) {
+        await db.savedGames.clear();
+        await db.savedGames.bulkAdd(data.games);
+      }
+      if (Array.isArray(data.mistakes)) {
+        await db.myMistakes.clear();
+        await db.myMistakes.bulkAdd(data.mistakes);
+      }
+      if (Array.isArray(data.daily)) {
+        await db.dailyActivity.clear();
+        await db.dailyActivity.bulkPut(data.daily);
+      }
+      if (Array.isArray(data.seen)) {
+        await db.seenPuzzles.clear();
+        await db.seenPuzzles.bulkPut(data.seen);
+      }
+    });
     return true;
   } catch (e) {
     console.error('Failed to import database backup', e);
     return false;
   }
+}
+
+/** Erase account-specific device data after an account deletion; keep the bundled puzzles. */
+export async function clearLocalProgress(): Promise<void> {
+  await db.transaction('rw', [db.userProfile, db.puzzles, db.puzzleHistory, db.savedGames, db.myMistakes, db.dailyActivity, db.seenPuzzles], async () => {
+    const importedKeys = await db.puzzles.where('source').equals('imported').primaryKeys();
+    await db.userProfile.clear();
+    await db.puzzles.bulkDelete(importedKeys);
+    await db.puzzleHistory.clear();
+    await db.savedGames.clear();
+    await db.myMistakes.clear();
+    await db.dailyActivity.clear();
+    await db.seenPuzzles.clear();
+  });
 }

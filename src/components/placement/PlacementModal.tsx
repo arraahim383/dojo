@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Chess, type Square } from 'chess.js';
 import { DojoBoard } from '../board/DojoBoard';
+import { BrandMark } from '../common/BrandMark';
 import { puzzleService, type ActivePuzzle } from '../../services/puzzleService';
 import { updateUserProfile, type UserProfile } from '../../db';
 import { sound } from '../../services/sound';
@@ -144,9 +145,7 @@ export const PlacementModal: React.FC<PlacementModalProps> = ({ isOpen, onComple
       <div className="bg-stone-900 border border-amber-600/40 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative text-stone-100 my-auto">
         {stage === 'prompt' && (
           <div className="text-center space-y-6 py-4 animate-fadeIn">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mx-auto text-3xl font-serif">
-              道
-            </div>
+            <BrandMark className="mx-auto h-16 w-16" />
             <div className="space-y-2">
               <h2 className="font-serif font-black text-3xl sm:text-4xl text-stone-100 tracking-tight">Welcome to Daba Dojo</h2>
               <p className="text-stone-300 text-sm max-w-md mx-auto leading-relaxed">

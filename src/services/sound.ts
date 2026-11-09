@@ -1,182 +1,102 @@
-// Web Audio API Synthesizer for Chess Sound Effects
-// Fast, lightweight, zero external asset dependencies
-
+// Short, quiet Web Audio cues. No sound files or network access are needed.
 class SoundEffectsService {
   private ctx: AudioContext | null = null;
-  private enabled: boolean = true;
+  private master: GainNode | null = null;
+  private enabled = true;
 
-  constructor() {
-    // AudioContext will be initialized on first user interaction
+  public setEnabled(value: boolean) {
+    this.enabled = value;
   }
 
-  public setEnabled(val: boolean) {
-    this.enabled = val;
-  }
-
-  public isEnabled(): boolean {
+  public isEnabled() {
     return this.enabled;
   }
 
-  private initCtx() {
-    if (!this.ctx && typeof window !== 'undefined') {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-      }
+  private audio() {
+    if (typeof window === 'undefined' || !this.enabled) return null;
+    if (!this.ctx) {
+      const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) return null;
+      this.ctx = new AudioContextClass();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = 0.34;
+      this.master.connect(this.ctx.destination);
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+    if (this.ctx.state === 'suspended') void this.ctx.resume().catch(() => undefined);
+    return this.ctx;
   }
 
-  // Regular piece move (warm wood knock)
+  private tone(frequency: number, duration: number, waveform: OscillatorType = 'sine', volume = 0.12, delay = 0) {
+    const ctx = this.audio();
+    if (!ctx || !this.master) return;
+    const start = ctx.currentTime + delay;
+    const oscillator = ctx.createOscillator();
+    const envelope = ctx.createGain();
+    oscillator.type = waveform;
+    oscillator.frequency.setValueAtTime(frequency, start);
+    envelope.gain.setValueAtTime(0.0001, start);
+    envelope.gain.exponentialRampToValueAtTime(volume, start + 0.008);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    oscillator.connect(envelope);
+    envelope.connect(this.master);
+    oscillator.start(start);
+    oscillator.stop(start + duration + 0.01);
+  }
+
+  private woodClick(intensity = 1) {
+    const ctx = this.audio();
+    if (!ctx || !this.master) return;
+    const length = Math.max(1, Math.floor(ctx.sampleRate * 0.045));
+    const noise = ctx.createBuffer(1, length, ctx.sampleRate);
+    const channel = noise.getChannelData(0);
+    for (let i = 0; i < length; i += 1) channel[i] = (Math.random() * 2 - 1) * (1 - i / length);
+
+    const source = ctx.createBufferSource();
+    const filter = ctx.createBiquadFilter();
+    const envelope = ctx.createGain();
+    filter.type = 'lowpass';
+    filter.frequency.value = intensity > 1 ? 1450 : 1000;
+    envelope.gain.setValueAtTime(0.0001, ctx.currentTime);
+    envelope.gain.exponentialRampToValueAtTime(0.16 * intensity, ctx.currentTime + 0.004);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+    source.buffer = noise;
+    source.connect(filter);
+    filter.connect(envelope);
+    envelope.connect(this.master);
+    source.start();
+
+    this.tone(intensity > 1 ? 155 : 190, 0.055, 'triangle', 0.08 * intensity);
+  }
+
   public playMove() {
-    if (!this.enabled) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(320, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.06);
-
-    gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.07);
+    this.woodClick();
   }
 
-  // Capture piece (sharp click + impact)
   public playCapture() {
-    if (!this.enabled) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(440, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.08);
-
-    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.09);
+    this.woodClick(1.35);
   }
 
-  // Check ping
   public playCheck() {
-    if (!this.enabled) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(660, this.ctx.currentTime + 0.15);
-
-    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.16);
+    this.tone(620, 0.1, 'sine', 0.07);
+    this.tone(760, 0.12, 'sine', 0.055, 0.075);
   }
 
-  // Castle (quick double wood tap)
   public playCastle() {
-    this.playMove();
-    setTimeout(() => this.playMove(), 80);
+    this.woodClick();
+    setTimeout(() => this.woodClick(), 85);
   }
 
-  // Puzzle success / Win
   public playSuccess() {
-    if (!this.enabled) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    const notes = [440, 554.37, 659.25, 880]; // A major arpeggio
-    notes.forEach((freq, idx) => {
-      const startTime = this.ctx!.currentTime + idx * 0.07;
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.2, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.18);
-
-      osc.connect(gain);
-      gain.connect(this.ctx!.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + 0.19);
-    });
+    [392, 494, 587].forEach((frequency, index) => this.tone(frequency, 0.16, 'sine', 0.07, index * 0.085));
   }
 
-  // Puzzle fail / Error
   public playError() {
-    if (!this.enabled) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    const notes = [260, 200];
-    notes.forEach((freq, idx) => {
-      const startTime = this.ctx!.currentTime + idx * 0.1;
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.25, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.14);
-
-      osc.connect(gain);
-      gain.connect(this.ctx!.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + 0.15);
-    });
+    this.tone(310, 0.08, 'triangle', 0.06);
+    this.tone(245, 0.09, 'triangle', 0.05, 0.085);
   }
 
-  // Coach Blunder warning (soft double chime alerting danger)
   public playWarning() {
-    if (!this.enabled) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(520, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(340, this.ctx.currentTime + 0.22);
-
-    gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.23);
+    this.tone(440, 0.13, 'sine', 0.055);
   }
 }
 

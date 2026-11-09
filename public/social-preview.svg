@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Daba Dojo — Learn chess one idea at a time</title>
+  <desc id="desc">Short lessons, useful practice and clear progress.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102b24"/><stop offset="1" stop-color="#0c0a09"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#275742" stop-opacity=".55"/><stop offset="1" stop-color="#173d32" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <ellipse cx="920" cy="290" rx="430" ry="380" fill="url(#glow)"/>
+  <g transform="translate(78 76)">
+    <rect width="58" height="58" rx="17" fill="#173d32" stroke="#d7b56d" stroke-opacity=".6"/>
+    <path d="M13 21c7-2.6 13-1.8 17 2.4v20c-4-3.8-9.5-4.8-17-2.5V21Zm32 0c-7-2.6-13-1.8-17 2.4v20c4-3.8 9.5-4.8 17-2.5V21Z" fill="#f3eedf"/>
+    <path d="M30 24v19M18 27c3-.4 5.4.1 7.5 1.3M42 27c-3-.4-5.4.1-7.5 1.3M22 15h16" fill="none" stroke="#173d32" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="30" cy="14" r="2.6" fill="#d7b56d"/>
+    <text x="78" y="25" fill="#f3eedf" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="4">DABA DOJO</text>
+    <text x="78" y="49" fill="#a7c4b4" font-family="Arial,sans-serif" font-size="14" letter-spacing="2">CHESS LEARNING</text>
+  </g>
+  <g transform="translate(905 158)" opacity=".88">
+    <rect x="0" y="0" width="224" height="224" rx="20" fill="#173d32" stroke="#8bab98" stroke-opacity=".4"/>
+    <g transform="translate(18 18)">
+      <rect x="0" y="0" width="47" height="47" fill="#dfd2b7"/><rect x="47" y="0" width="47" height="47" fill="#52765f"/>
+      <rect x="94" y="0" width="47" height="47" fill="#dfd2b7"/><rect x="141" y="0" width="47" height="47" fill="#52765f"/>
+      <rect x="0" y="47" width="47" height="47" fill="#52765f"/><rect x="47" y="47" width="47" height="47" fill="#dfd2b7"/>
+      <rect x="94" y="47" width="47" height="47" fill="#52765f"/><rect x="141" y="47" width="47" height="47" fill="#dfd2b7"/>
+      <rect x="0" y="94" width="47" height="47" fill="#dfd2b7"/><rect x="47" y="94" width="47" height="47" fill="#52765f"/>
+      <rect x="94" y="94" width="47" height="47" fill="#dfd2b7"/><rect x="141" y="94" width="47" height="47" fill="#52765f"/>
+      <rect x="0" y="141" width="47" height="47" fill="#52765f"/><rect x="47" y="141" width="47" height="47" fill="#dfd2b7"/>
+      <rect x="94" y="141" width="47" height="47" fill="#52765f"/><rect x="141" y="141" width="47" height="47" fill="#dfd2b7"/>
+    </g>
+    <circle cx="112" cy="112" r="37" fill="#173d32" stroke="#d7b56d" stroke-width="2"/>
+    <path d="M91 124c3-6 4-11 4-17 0-9 6-16 15-18l7 5 8 5-6 6-9-3-2 8 6 7 3 8H91Zm4 5h37v5H95z" fill="#f3eedf"/>
+    <circle cx="111" cy="99" r="2" fill="#d7b56d"/>
+  </g>
+  <text x="80" y="265" fill="#f4f1e8" font-family="Arial,sans-serif" font-size="64" font-weight="700" letter-spacing="-2">Chess gets clearer.</text>
+  <text x="84" y="325" fill="#c9d8cf" font-family="Arial,sans-serif" font-size="25">Short lessons. Useful practice. Clear progress.</text>
+  <g font-family="Arial,sans-serif" font-size="17" font-weight="700">
+    <rect x="82" y="385" width="163" height="43" rx="21" fill="#183d32" stroke="#5d9276"/><text x="108" y="412" fill="#e5f0e8">LEARN</text>
+    <rect x="257" y="385" width="172" height="43" rx="21" fill="#183d32" stroke="#5d9276"/><text x="284" y="412" fill="#e5f0e8">PRACTICE</text>
+    <rect x="441" y="385" width="144" height="43" rx="21" fill="#183d32" stroke="#5d9276"/><text x="468" y="412" fill="#e5f0e8">IMPROVE</text>
+  </g>
+  <path d="M82 504h1036" stroke="#d7b56d" stroke-opacity=".55"/>
+  <text x="82" y="547" fill="#e4d19d" font-family="Arial,sans-serif" font-size="19" letter-spacing="2">A PERSONAL CHESS TRAINER</text>
+  <text x="82" y="580" fill="#aab8ad" font-family="Arial,sans-serif" font-size="16">Lessons · puzzles · bots · game review</text>
+</svg>

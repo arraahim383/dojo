@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Chess } from 'chess.js';
 import { Sparkles, X, Brain, ShieldAlert, Loader2 } from 'lucide-react';
 import { engine } from '../../services/engine';
-import { hasServer } from '../../services/paths';
+import { apiUrl, hasGeminiCoach } from '../../services/paths';
 
 interface GeminiCoachModalProps {
   isOpen: boolean;
@@ -57,11 +57,11 @@ export const GeminiCoachModal: React.FC<GeminiCoachModalProps> = ({
         }
         if (!alive) return;
         setLines(grounding);
-        if (!hasServer) {
-          setUnavailable('The coach needs the Node server (npm start with a GEMINI_API_KEY). Stockfish’s best lines are shown below.');
+        if (!hasGeminiCoach) {
+          setUnavailable('The coach is not enabled on this static site. Stockfish’s best lines are shown below.');
           return;
         }
-        const res = await fetch('/api/explain', {
+        const res = await fetch(apiUrl('/api/explain'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ fen, move: moveSan || '(no move)', bestLines: grounding, userLevel, context }),
@@ -95,7 +95,7 @@ export const GeminiCoachModal: React.FC<GeminiCoachModalProps> = ({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-serif font-bold text-lg text-amber-300 tracking-wide">Sensei's Counsel</h3>
+              <h3 className="font-serif font-bold text-lg text-amber-300 tracking-wide">Chess coach</h3>
               <p className="text-xs text-stone-400">Gemini explains, grounded in Stockfish lines</p>
             </div>
           </div>
@@ -122,7 +122,7 @@ export const GeminiCoachModal: React.FC<GeminiCoachModalProps> = ({
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center space-y-3">
               <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
-              <p className="text-sm text-stone-400 font-serif italic">Sensei is looking at the board...</p>
+              <p className="text-sm text-stone-400">The coach is reviewing the position…</p>
             </div>
           ) : unavailable ? (
             <div className="p-4 rounded-xl bg-stone-950/60 border border-stone-700 text-stone-300 text-sm flex items-start gap-3">

@@ -139,7 +139,7 @@ export const OpeningsView: React.FC<OpeningsViewProps> = ({ userProfile }) => {
           Opening Repertoire & Strategic Principles
         </div>
         <h1 className="text-3xl font-serif font-black text-stone-100 tracking-tight">
-          Opening Explorer & Repertoire Dojo
+          Opening explorer and practice
         </h1>
         <p className="text-stone-400 text-xs sm:text-sm max-w-lg mx-auto">
           Drill core opening lines move-by-move. Learn the fundamental tactical ideas and pawn structures behind each opening.
@@ -264,7 +264,7 @@ export const OpeningsView: React.FC<OpeningsViewProps> = ({ userProfile }) => {
                   <span>Repertoire Line Mastered!</span>
                 </div>
                 <p className="text-xs text-stone-300">
-                  Every move executed with precision according to the Dojo opening repertoire.
+                  Review each move and the idea behind it.
                 </p>
                 <div className="flex gap-2 pt-2">
                   <button

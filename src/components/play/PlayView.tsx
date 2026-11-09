@@ -6,6 +6,7 @@ import { engine } from '../../services/engine';
 import { db, getUserProfile, updateUserProfile, bumpDailyActivity, type UserProfile } from '../../db';
 import { sound } from '../../services/sound';
 import { GeminiCoachModal } from '../common/GeminiCoachModal';
+import { BrandMark } from '../common/BrandMark';
 import {
   Swords,
   Shield,
@@ -121,7 +122,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
   const buildPgn = (c: Chess, resultTag: string): string => {
     const copy = new Chess();
     for (const m of c.history()) copy.move(m);
-    const youName = 'Disciple (You)';
+    const youName = 'You';
     const botName = `${selectedBot.name} (${selectedBot.elo})`;
     copy.setHeader('Event', 'Daba Dojo sparring');
     copy.setHeader('Date', new Date().toISOString().slice(0, 10).replace(/-/g, '.'));
@@ -136,8 +137,8 @@ export const PlayView: React.FC<PlayViewProps> = ({
     if (c.history().length === 0) return;
     const record = {
       pgn: buildPgn(c, resultTag),
-      white: playerColor === 'white' ? 'Disciple (You)' : `${selectedBot.name} (${selectedBot.elo})`,
-      black: playerColor === 'black' ? 'Disciple (You)' : `${selectedBot.name} (${selectedBot.elo})`,
+      white: playerColor === 'white' ? 'You' : `${selectedBot.name} (${selectedBot.elo})`,
+      black: playerColor === 'black' ? 'You' : `${selectedBot.name} (${selectedBot.elo})`,
       date: new Date().toLocaleDateString(),
       result: resultText,
       userColor: playerColor,
@@ -516,7 +517,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
     }
   };
 
-  // Arrows are strictly visible ONLY when seeking help (e.g. clicking Sensei Hint)
+  // Arrows are shown only when the player asks for help or coaching.
   const activeArrows = hintArrow.length ? hintArrow : threatArrow;
 
   return (
@@ -528,13 +529,13 @@ export const PlayView: React.FC<PlayViewProps> = ({
           <div className="text-center space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-widest uppercase">
               <Swords className="w-3.5 h-3.5" />
-              Tatami Sparring Arena
+              Practice game
             </div>
             <h1 className="text-3xl sm:text-4xl font-serif font-black text-stone-100 tracking-tight">
-              Play Against Dojo Opponents
+              Play a bot
             </h1>
             <p className="text-stone-400 text-sm max-w-lg mx-auto">
-              From white-belt novices to the grand patriarch, test your training against distinct personalities and styles.
+              Choose a comfortable level. Each bot has its own style, and you can use coaching while you learn.
             </p>
           </div>
 
@@ -597,14 +598,14 @@ export const PlayView: React.FC<PlayViewProps> = ({
           <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-xl space-y-6">
             <h3 className="font-serif font-bold text-stone-200 text-lg flex items-center gap-2">
               <Settings2 className="w-5 h-5 text-amber-500" />
-              Sparring Settings
+              Game settings
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Play As */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">
-                  Your Tatami Side
+                  Play as
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -615,7 +616,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
                         : 'bg-stone-800 text-stone-300 border-stone-700 hover:bg-stone-700'
                     }`}
                   >
-                    White (Move First)
+                    White (play first)
                   </button>
                   <button
                     onClick={() => setPlayerColor('black')}
@@ -625,7 +626,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
                         : 'bg-stone-800 text-stone-300 border-stone-700 hover:bg-stone-700'
                     }`}
                   >
-                    Black (Counter)
+                    Black (play second)
                   </button>
                 </div>
               </div>
@@ -633,7 +634,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
               {/* Time Control */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">
-                  Clock Regulation
+                  Time control
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -660,7 +661,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
               {/* Coach Mode Active */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">
-                  Sensei Mentorship
+                  Coach assistance
                 </label>
                 <div
                   onClick={() => setCoachMode(!coachMode)}
@@ -743,12 +744,10 @@ export const PlayView: React.FC<PlayViewProps> = ({
             {/* Player Card Footer */}
             <div className="w-full max-w-[560px] flex items-center justify-between bg-stone-900 border border-stone-800 rounded-b-xl px-4 py-2.5 mt-2 shadow-md">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-600/30 border border-amber-500/40 flex items-center justify-center text-sm font-bold text-amber-400 font-serif">
-                  道
-                </div>
+                <BrandMark className="h-8 w-8" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-serif font-bold text-stone-100 text-sm">Disciple (You)</span>
+                    <span className="font-serif font-bold text-stone-100 text-sm">You</span>
                     <span className="text-[11px] font-mono text-stone-400">Level {userProfile.currentLevel}</span>
                   </div>
                   <span className="text-[10px] text-amber-500 font-bold">Rating {userProfile.puzzleRating}</span>
@@ -778,11 +777,11 @@ export const PlayView: React.FC<PlayViewProps> = ({
               <button
                 onClick={handleRequestHint}
                 disabled={isBotThinking || !!gameResult}
-                title="Ask Sensei for a hint"
+                title="Ask for a move hint"
                 className="flex-1 py-2.5 px-3 rounded-xl bg-stone-800/90 hover:bg-stone-700 border border-stone-700/80 text-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer"
               >
                 <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-                <span>Sensei Hint</span>
+                <span>Move hint</span>
               </button>
 
               <button
@@ -864,7 +863,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
               <div className="flex items-center justify-between pb-3 border-b border-stone-800">
                 <div className="flex items-center gap-2 text-xs font-bold text-stone-300">
                   <Shield className="w-4 h-4 text-amber-500" />
-                  <span>Sensei Guidance</span>
+                  <span>Coach guidance</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-mono text-stone-400" title="Stockfish evaluation from White's point of view (+ means White is better)">
                   <span>{checkingMove ? 'Checking move…' : 'Eval (White):'}</span>
@@ -967,7 +966,7 @@ export const PlayView: React.FC<PlayViewProps> = ({
           <div className="bg-stone-900 border border-red-500/50 rounded-2xl max-w-sm w-full p-5 shadow-2xl text-stone-100">
             <div className="flex items-center gap-3 mb-3 text-red-400">
               <AlertTriangle className="w-6 h-6 shrink-0" />
-              <h3 className="font-serif font-bold text-base">Sensei Warning!</h3>
+              <h3 className="font-serif font-bold text-base">Move warning</h3>
             </div>
             <p className="text-xs text-stone-300 leading-relaxed mb-5">
               {warningModal.reason}

@@ -340,6 +340,7 @@ class PuzzleService {
       if (themes.length === 0) continue; // line did not validate
       batch.push({
         id: cols[iId],
+        source: 'imported',
         fen,
         moves,
         rating: parseInt(cols[iRating] || '1500', 10) || 1500,

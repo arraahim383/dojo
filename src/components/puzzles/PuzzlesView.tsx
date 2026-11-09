@@ -31,6 +31,7 @@ import {
 interface PuzzlesViewProps {
   userProfile: UserProfile;
   onRefreshProfile: () => void;
+  initialMode?: 'rated' | 'mistakes';
 }
 
 type PuzzleMode = 'rated' | 'rush' | 'survival' | 'battle' | 'daily' | 'themes' | 'mistakes';
@@ -38,8 +39,8 @@ type PuzzleMode = 'rated' | 'rush' | 'survival' | 'battle' | 'daily' | 'themes' 
 const RUSH_SECONDS = 300;
 const rushTarget = (score: number) => Math.min(2200, 450 + score * 60);
 
-export const PuzzlesView: React.FC<PuzzlesViewProps> = ({ userProfile, onRefreshProfile }) => {
-  const [mode, setMode] = useState<PuzzleMode>('rated');
+export const PuzzlesView: React.FC<PuzzlesViewProps> = ({ userProfile, onRefreshProfile, initialMode = 'rated' }) => {
+  const [mode, setMode] = useState<PuzzleMode>(initialMode);
   const [activePuzzle, setActivePuzzle] = useState<ActivePuzzle | null>(null);
   const [boardFen, setBoardFen] = useState<string>(new Chess().fen());
   const [solutionStep, setSolutionStep] = useState<number>(0);
