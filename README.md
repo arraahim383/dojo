@@ -49,6 +49,8 @@ The account screen is ready for Supabase email/password authentication. To turn 
 
 5. Redeploy the website. For Android, build the APK after setting the three `VITE_` values so sign-in is enabled in that APK too.
 
+**Before opening registration to the public:** Supabase's built-in email sender is for testing only; it is rate-limited and only delivers to project team addresses. Configure a custom SMTP provider with a verified sender domain in Supabase Auth settings before relying on email confirmation or password resets for general users. Keep email confirmation enabled. The app uses the same Supabase account store on the web and APK; the APK contains only the publishable client key, while the server secret stays in Vercel.
+
 The first account on a device adopts existing local progress. Later sign-ins restore that account's cloud progress; changing to a different account clears the previous account's cached records before restoring the new account. The bundled 20,970-puzzle set remains local, while user-imported puzzles and training progress sync. If the account service is not configured, the app clearly offers local mode and does not claim that progress is syncing. Account data is associated with the user's email; it is stored in the private progress database, not in the email inbox. See [`public/privacy.html`](public/privacy.html).
 
 ### Optional: the Gemini coach
