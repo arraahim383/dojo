@@ -37,13 +37,15 @@ The account screen is ready for Supabase email/password authentication. To turn 
    VITE_AUTH_REDIRECT_URL=https://dojo-omega-two.vercel.app
    ```
 
-4. For account deletion, add these server-only variables to Vercel and local `.env.local`; the service-role value must never have a `VITE_` prefix or be bundled into the APK:
+4. If you connect Supabase through Vercel Marketplace, its `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` values are used by the web app automatically. The app only exposes the public Supabase key in its client bundle. For account deletion, the integration's server-only `SUPABASE_SECRET_KEY` is supported; never add it to a `VITE_`/`NEXT_PUBLIC_` variable or bundle it into the APK. When configuring Supabase manually, use these server variables instead:
 
    ```text
    SUPABASE_URL=https://YOUR_PROJECT.supabase.co
    SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
    SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SERVICE_ROLE_KEY
    ```
+
+   Marketplace integrations may use `SUPABASE_PUBLISHABLE_KEY` instead of `SUPABASE_ANON_KEY` for the public server-side client key.
 
 5. Redeploy the website. For Android, build the APK after setting the three `VITE_` values so sign-in is enabled in that APK too.
 

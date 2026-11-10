@@ -16,8 +16,8 @@ export default async function handler(req: any, res: any) {
   if (origin && !isAllowedOrigin) return res.status(403).json({ error: 'This app origin is not allowed.' });
 
   const projectUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const publicKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const publicKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
   if (!projectUrl || !publicKey || !serviceKey) {
     return res.status(503).json({ error: 'Account deletion is not configured on the server.' });
   }
